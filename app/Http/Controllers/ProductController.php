@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Product;
+use Illuminate\Support\Facades\Storage;
+use Image;
+
 class ProductController extends Controller
 {
     /**
@@ -29,6 +32,12 @@ class ProductController extends Controller
     {
         //
         $input = $request->all();
+
+        $destinationPath = 'product_image'; // upload path
+        $fileName = $destinationPath.'/'.uniqid()."." . $request->file('image')->getClientOriginalExtension();
+        $uploadFile = Storage::put($fileName, file_get_contents($request->file('image'))); 
+
+        $input['image'] = $fileName;
 
         $result = Product::create($input);
 
