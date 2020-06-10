@@ -16,7 +16,7 @@ class ProductCategoryController extends Controller
     public function index()
     {
         //
-        $result = ProductCategory::orderBy('created_at','desc')->get();
+        $result = ProductCategory::orderBy('created_at','desc')->with('products')->get();
 
         return response()->json($result);
     }
@@ -48,7 +48,7 @@ class ProductCategoryController extends Controller
     {
         //
 
-        $result = ProductCategory::whereId($id)->first();
+        $result = ProductCategory::whereId($id)->with('products')->first();
 
         return response()->json($result);
     }

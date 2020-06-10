@@ -17,7 +17,7 @@ class ProductController extends Controller
     public function index()
     {
         //
-        $result = Product::orderBy('created_at','desc')->get();
+        $result = Product::orderBy('created_at','desc')->with('product_category')->get();
 
         return response()->json($result);
     }
@@ -53,7 +53,7 @@ class ProductController extends Controller
     public function show($id)
     {
         //
-        $result = Product::whereId($id)->first();
+        $result = Product::whereId($id)->with('product_category')->first();
 
         return response()->json($result);
     }
@@ -69,7 +69,38 @@ class ProductController extends Controller
     {
         //
         $input = $request->all();
+        $fromDB = Product::whereId($id)->first();
+            // dd($fromDB);
+            
+            if($request['image']){
+                if($fromDB['image'] === $request['image']){
+                    $imageUrl = explode('/product_image/', $request['image']);
+                    $input['image'] = $file_folder.'/'.$imageUrl[1];
+                }
+                else{
+
+                    $destinationPath = 'product_image'; // upload path
+                    $fileName = $destinationPath.'/'.uniqid()."." . $request->file('image')->getClientOriginalExtension();
+                    $uploadFile = Storage::put($fileName, file_get_contents($request->file('image'))); 
+                    $input['image'] = $fileName;
+                    
+                }
+            }
+            else{
+                $input['image'] =  "";
+            }
         $result = Product::whereId($id)->update($input);
+
+        return response()->json($result);
+    }
+
+    public function update_status(Request $request,$id)
+    {
+        //
+
+        $result = Product::whereId($id)->update([
+            'status' => $request['status']
+        ]);
 
         return response()->json($result);
     }
